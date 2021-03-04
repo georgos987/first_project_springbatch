@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-phpmyadmin
+  labels:
+    app: app-phpmyadmin
+spec:
+  selector:
+    matchLabels:
+      app: app-phpmyadmin
+  template:
+    metadata:
+      labels:
+        app: app-phpmyadmin
+    spec:
+      containers:
+      - name: app-phpmyadmin
+        image: phpmyadmin/phpmyadmin
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+        env: 
+        - name: MYSQL_ROOT_PASSWORD
+          value: "1234"
+        - name: "MYSQL_DATABASE"
+          value: "batch"
+        - name: "MYSQL_USER"
+          value: "georgos"
+        - name: "MYSQL_PASSWORD"
+          value: "1234"
+        - name: PMA_HOST
+          value: mysql-service
+        - name: PMA_PORT
+          value: "3306"
+        - name: MYSQL_PORT
+          value: "3306"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name:  phpmyadmin-sevice-tool
+spec:
+  type: LoadBalancer  
+  selector:
+    app:  app-phpmyadmin
+  ports:
+  - port: 8002
+    targetPort: 80
+    nodePort: 31002
