@@ -97,13 +97,13 @@ class FirstProjectApplicationTests {
 	
 	JobConfiguration jobConfiguration = EasyMock.createMock(JobConfiguration.class);
 	
-	@Test
-	void readerTest1() {
-		JobConfiguration jobConfiguration1= new JobConfiguration();
-		Person person1 = new Person("Ahmad", "2000-01-02", "Ahmad.com", 99000, true);
-		IExpectationSetters<JdbcCursorItemReader<Person>> x = EasyMock.expect(jobConfiguration.reader(datasource)).andReturn(jdbcCursorItemReader);
-		System.out.println(x+"111111111111");
-	}
+//	@Test
+//	void readerTest1() {
+//		JobConfiguration jobConfiguration1= new JobConfiguration();
+//		Person person1 = new Person("Ahmad", "2000-01-02", "Ahmad.com", 99000, true);
+//		IExpectationSetters<JdbcCursorItemReader<Person>> x = EasyMock.expect(jobConfiguration.reader(datasource)).andReturn(jdbcCursorItemReader);
+//		System.out.println(x+"111111111111");
+//	}
 	
 	
 	@Test
@@ -137,7 +137,6 @@ class FirstProjectApplicationTests {
 	void readerTest() throws UnexpectedInputException, ParseException, Exception {
 		EasyMock.expect(jobConfiguration.job()).andReturn(job);
 		
-		EasyMock.expect(jobConfiguration.reader(datasource)).andReturn(jdbcCursorItemReader);
 		
 		EasyMock.expect(jobConfiguration.writer(datasource)).andReturn(jdbcBatchItemWriter);
 		

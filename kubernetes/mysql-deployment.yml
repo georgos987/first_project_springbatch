@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-mysql
+  labels:
+    app: app-mysql
+spec:
+  replicas: 1
+  selector:
+
+    matchLabels:
+      app: app-mysql
+  template:
+    metadata:
+      labels:
+        app: app-mysql
+    spec:
+      containers:
+      - name: app-mysql
+        image: mysql:latest
+        volumeMounts:
+          - mountPath: /var/lib/mysql
+            name: batch-volume
+          - name: initdb
+            mountPath: /docker-entrypoint-initdb.d   
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        ports:
+        - containerPort: 3306
+
+        env: 
+        - name: "MYSQL_ROOT_PASSWORD"
+          value: "1234"
+        - name: "MYSQL_DATABASE"
+          value: "batch"
+        - name: "MYSQL_USER"
+          value: "georgos"
+        - name: "MYSQL_PASSWORD"
+          value: "1234"
+      volumes:
+        - name: batch-volume
+          persistentVolumeClaim:
+            claimName: batch-pv-claim
+        - name: initdb
+          configMap:
+            name: initdb-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: app-mysql
+  ports:
+  - port: 3306
+    targetPort: 3306
+    nodePort: 31005
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: batch-pv-claim
+  labels:
+    app: app-mysql
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+ name: initdb-config
+data:
+  initdb.sql: |
+
+      DROP SCHEMA IF EXISTS `batch`;
+
+      CREATE SCHEMA `batch`;
+      USE `batch` ;
+
+       CREATE TABLE IF NOT EXISTS `batch`.`person` (
+          `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+          `name` VARCHAR(255) NULL DEFAULT NULL,
+          `birthday` VARCHAR(255) DEFAULT NULL,
+          `email` VARCHAR(255) NULL DEFAULT NULL,
+          `revenue` BIGINT(20) NULL DEFAULT NULL,
+          `customer` Boolean DEFAULT 1,
+
+        PRIMARY KEY (`id`)
+        )
+         ENGINE=InnoDB
+         AUTO_INCREMENT = 1;
+
+        INSERT INTO `person`(NAME,BIRTHDAY,EMAIL,REVENUE,CUSTOMER) 
+        VALUES ('Daliah Shah','1987-04-19','Daliah.Shah@domain.xyz',3000,0),
+        ('Wei Lang','1988-04-19','Wei.Lang@domain.xyz',5000,0),
+        ('Zane Sanchez','1987-09-19','Zane.Sanchez@domain.xyz',3000,1),
+        ('Sofia Carvalho','2000-04-19','Sofia.Carvalho@domain.xyz',2000,1),
+        ('Avery Gill','1980-04-19','Avery.Gill@domain.xyz',3200,0),
+        ('Georgos Makhool','1980-01-01','Avery.Gill@domain.xyz',2500,1);
+
+
+

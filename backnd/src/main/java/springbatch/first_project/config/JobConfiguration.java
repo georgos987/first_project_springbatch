@@ -10,16 +10,20 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
-
+import org.springframework.batch.item.excel.RowMapper;
+import org.springframework.batch.item.excel.mapping.BeanWrapperRowMapper;
+import org.springframework.batch.item.excel.poi.PoiItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -46,7 +50,7 @@ public class JobConfiguration {
 	
 	@Bean
 	public Job job() {
-		return jobBuilderFactory.get("myjob21")
+		return jobBuilderFactory.get("myjob201")
 				.start(step())
 				.listener(new CourseUtilJobSummaryListener())
 				.build();
@@ -70,17 +74,18 @@ public class JobConfiguration {
 	
 	@Bean
 	@StepScope
-	public JdbcCursorItemReader<Person> reader(DataSource dataSource) {
-		
-		JdbcCursorItemReaderBuilder<Person> xreader = new JdbcCursorItemReaderBuilder<Person>()
-				
-				.name("itemReader")
-				.dataSource(dataSource)
-				.sql("SELECT * FROM `person` WHERE 1")
-				.rowMapper(new BeanPropertyRowMapper<>(Person.class));
-		return xreader.build();
-				
-	}
+    ItemReader<Person> reader(@Value("#{jobParameters['inputPath']}") String inputPath) {
+        PoiItemReader<Person> reader = new PoiItemReader<>();
+        reader.setLinesToSkip(1);
+        reader.setResource(new ClassPathResource(inputPath));
+        reader.setRowMapper(excelRowMapper());
+        return reader;
+    }
+    private RowMapper<Person> excelRowMapper() {
+        BeanWrapperRowMapper<Person> rowMapper = new BeanWrapperRowMapper<>();
+        rowMapper.setTargetType(Person.class);
+        return rowMapper;
+    }
 	
 	@Bean
 	@StepScope
