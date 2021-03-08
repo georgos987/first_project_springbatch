@@ -87,12 +87,12 @@ data:
       USE `batch` ;
 
        CREATE TABLE IF NOT EXISTS `batch`.`person` (
-          `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+          `id` INT(20) NOT NULL AUTO_INCREMENT,
           `name` VARCHAR(255) NULL DEFAULT NULL,
           `birthday` VARCHAR(255) DEFAULT NULL,
           `email` VARCHAR(255) NULL DEFAULT NULL,
-          `revenue` BIGINT(20) NULL DEFAULT NULL,
-          `customer` Boolean DEFAULT 1,
+          `revenue` INT(20) NULL DEFAULT NULL,
+          `customer` Boolean DEFAULT true,
 
         PRIMARY KEY (`id`)
         )
@@ -100,12 +100,12 @@ data:
          AUTO_INCREMENT = 1;
 
         INSERT INTO `person`(NAME,BIRTHDAY,EMAIL,REVENUE,CUSTOMER) 
-        VALUES ('Daliah Shah','1987-04-19','Daliah.Shah@domain.xyz',3000,0),
-        ('Wei Lang','1988-04-19','Wei.Lang@domain.xyz',5000,0),
-        ('Zane Sanchez','1987-09-19','Zane.Sanchez@domain.xyz',3000,1),
-        ('Sofia Carvalho','2000-04-19','Sofia.Carvalho@domain.xyz',2000,1),
-        ('Avery Gill','1980-04-19','Avery.Gill@domain.xyz',3200,0),
-        ('Georgos Makhool','1980-01-01','Avery.Gill@domain.xyz',2500,1);
+        VALUES ('Daliah Shah','1987-04-19','Daliah.Shah@domain.xyz',3000,false),
+        ('Wei Lang','1988-04-19','Wei.Lang@domain.xyz',5000,false),
+        ('Zane Sanchez','1987-09-19','Zane.Sanchez@domain.xyz',3000,true),
+        ('Sofia Carvalho','2000-04-19','Sofia.Carvalho@domain.xyz',2000,true),
+        ('Avery Gill','1980-04-19','Avery.Gill@domain.xyz',3200,false),
+        ('Georgos Makhool','1980-01-01','Avery.Gill@domain.xyz',2500,true);
 
 
 

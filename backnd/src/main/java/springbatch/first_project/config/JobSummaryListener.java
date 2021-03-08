@@ -12,9 +12,9 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CourseUtilJobSummaryListener implements JobExecutionListener {
+public class JobSummaryListener implements JobExecutionListener {
 
-    private static final Logger LOGGER = LogManager.getLogger(CourseUtilJobSummaryListener.class);
+    private static final Logger LOGGER = LogManager.getLogger(JobSummaryListener.class);
 
     @Override
     public void beforeJob(JobExecution jobExecution) {

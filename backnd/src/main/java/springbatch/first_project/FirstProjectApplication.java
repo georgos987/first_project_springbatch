@@ -13,17 +13,20 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 
 import springbatch.first_project.jobs.AnonymizeJob;
 @EntityScan(basePackageClasses = { 
-		FirstProjectApplication.class,
-		Jsr310JpaConverters.class 
+		FirstProjectApplication.class
 })
+@Configuration
 @SpringBootApplication
 @EnableBatchProcessing
+@ComponentScan(basePackageClasses = FirstProjectApplication.class)
 public class FirstProjectApplication {
 
 	@PostConstruct

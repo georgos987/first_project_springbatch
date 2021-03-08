@@ -135,10 +135,10 @@ class FirstProjectApplicationTests {
 	@Test
 	@Disabled
 	void readerTest() throws UnexpectedInputException, ParseException, Exception {
-		EasyMock.expect(jobConfiguration.job()).andReturn(job);
+//		EasyMock.expect(jobConfiguration.job()).andReturn(job);
 		
 		
-		EasyMock.expect(jobConfiguration.writer(datasource)).andReturn(jdbcBatchItemWriter);
+		///EasyMock.expect(jobConfiguration.writer(datasource)).andReturn(jdbcBatchItemWriter);
 		
 		EasyMock.replay(jobConfiguration);
 
