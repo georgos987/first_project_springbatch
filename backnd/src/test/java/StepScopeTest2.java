@@ -15,9 +15,7 @@ import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourc
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.excel.poi.PoiItemReader;
-import org.springframework.batch.item.json.JacksonJsonObjectMarshaller;
-import org.springframework.batch.item.json.JsonFileItemWriter;
-import org.springframework.batch.item.json.builder.JsonFileItemWriterBuilder;
+
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,9 +25,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-
+import org.springframework.core.io.UrlResource;
 import springbatch.first_project.FirstProjectApplication;
 import springbatch.first_project.config.CourseUtils;
 import springbatch.first_project.config.PersonExcelRowMapper;
@@ -54,7 +51,7 @@ class StepScopeTest2 {
 	void runJob() throws Exception {
 		{
 			JobParameters jobParameters = new JobParametersBuilder()
-					.addParameter("inputPath", new JobParameter("classpath:person.xlsx"))
+					.addString("inputPath", "person89.xlsx")
 					.addParameter("outputPath", new JobParameter("output/chunkoutput.json"))
 
 					.toJobParameters();
@@ -94,10 +91,10 @@ class StepScopeTest2 {
 		@Bean
 		public Step step(JdbcBatchItemWriter <AnonymizePerson> writer
 				,ItemProcessor<Person, AnonymizePerson> processor
-				,ItemReader<Person> reader) throws IOException {
+				,PoiItemReader<Person> reader) throws IOException {
 			System.out.println("step");
 			Step step = stepBuilderFactory
-					.get("step").<Person, AnonymizePerson>chunk(1)
+					.get("step").<Person, AnonymizePerson>chunk(3)
 					.reader(reader)
 					.processor(processor)
 					.writer(writer)
@@ -127,29 +124,29 @@ class StepScopeTest2 {
 			};
 		}
 
-//		@Bean
-//		@StepScope
-//		public ItemReader<Person> reader(@Value("#{jobParameters['inputPath']}") String inputPath) {
-//			System.out.println("ItemReader");
-//			PoiItemReader<Person> reader = new PoiItemReader<Person>();
-//			reader.setName("readername");
-//			reader.setLinesToSkip(1);
-//			reader.setResource(new ClassPathResource(inputPath));
-//			reader.setRowMapper(new PersonExcelRowMapper());
-//			return reader;
-//		}
-//		
 		@Bean
 		@StepScope
-		public ItemReader<Person> reader(Environment environment){
+		public PoiItemReader<Person> reader(@Value("#{jobParameters[inputPath]}") String inputPath) {
 			System.out.println("ItemReader");
-	        PoiItemReader<Person> reader = new PoiItemReader<Person>();
-	        reader.setName("neadername");
-	        reader.setLinesToSkip(1);
-	        reader.setResource(new ClassPathResource(environment.getProperty(PROPERTY_EXCEL_SOURCE_FILE_PATH)));
-	        reader.setRowMapper(new PersonExcelRowMapper());
-	        return reader;
-	    }
+			PoiItemReader<Person> reader = new PoiItemReader<Person>();
+			reader.setName("readername");
+			reader.setLinesToSkip(1);
+			reader.setResource(new ClassPathResource(inputPath));
+			reader.setRowMapper(new PersonExcelRowMapper());
+			return reader;
+		}
+//		
+//		@Bean
+//		@StepScope
+//		public ItemReader<Person> reader(Environment environment){
+//			System.out.println("ItemReader");
+//	        PoiItemReader<Person> reader = new PoiItemReader<Person>();
+//	        reader.setName("neadername");
+//	        reader.setLinesToSkip(1);
+//	        reader.setResource(new ClassPathResource(environment.getProperty(PROPERTY_EXCEL_SOURCE_FILE_PATH)));
+//	        reader.setRowMapper(new PersonExcelRowMapper());
+//	        return reader;
+//	    }
 
 		@Bean
 		@StepScope
@@ -161,7 +158,6 @@ class StepScopeTest2 {
 		 JdbcBatchItemWriterBuilder<AnonymizePerson> itemSqlParameterSourceProvider  =  namedParametersJdbcTemplate
 					.assertUpdates(true)
 					.itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<AnonymizePerson>());
-		  System.out.println("Ende den job");
 			return itemSqlParameterSourceProvider
 					.sql("INSERT INTO anonymize_person (ID, NAME, BIRTHDAY,REVENUE,CUSTOMER) VALUES(:id, :name, :birthday, :revenue, :customer)")
 					.build();

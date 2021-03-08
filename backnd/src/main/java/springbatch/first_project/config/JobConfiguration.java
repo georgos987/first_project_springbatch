@@ -1,7 +1,10 @@
 package springbatch.first_project.config;
 
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PushbackInputStream;
 import java.nio.charset.Charset;
 import java.util.Random;
 
@@ -27,6 +30,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.PathResource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 
@@ -71,12 +76,14 @@ public class JobConfiguration {
 	// after return reader the job is finish, no calling processor or writer
 	@Bean
 	@StepScope
-	public ItemReader<Person> reader(@Value("#{jobParameters['inputPath']}") String inputPath){
+	public PoiItemReader<Person> reader(@Value("#{jobParameters['inputPath']}") String inputPath) throws FileNotFoundException{
 		System.out.println("ItemReader");
         PoiItemReader<Person> reader = new PoiItemReader<Person>();
+        PushbackInputStream input = new PushbackInputStream(new FileInputStream(inputPath));
+        InputStreamResource resource = new InputStreamResource(input);
         reader.setName("readername");
         reader.setLinesToSkip(1);
-        reader.setResource(new ClassPathResource(inputPath));
+        reader.setResource(resource);
         reader.setRowMapper(new PersonExcelRowMapper());
         return reader;
     }
@@ -95,6 +102,7 @@ public class JobConfiguration {
 
     
 	@Bean
+	@StepScope
 	public ItemProcessor<Person,AnonymizePerson> processor() {
 		System.out.println("processor");
 

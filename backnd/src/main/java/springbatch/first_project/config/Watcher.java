@@ -20,9 +20,8 @@ public class Watcher {
 	@Autowired
 	private AnonymizeJob anonymizeJob;
 
-	public final String DATA_DIRECTORY = 
-			FilenameUtils.concat(System.getProperty("user.dir"),"data" );
-
+	public final String DATA_DIRECTORY = "C:\\Users\\gMakhool\\OneDrive - Consileon\\Desktop\\sprinbatch\\first_project_springbatch\\backnd\\src\\main\\resources\\data";
+			
 	@EventListener(value = ApplicationReadyEvent.class)
 	public void WatcherAfterApplicationStarted() throws Exception {
 		System.out.println(DATA_DIRECTORY);
