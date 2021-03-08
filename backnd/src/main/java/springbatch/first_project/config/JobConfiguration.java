@@ -72,7 +72,7 @@ public class JobConfiguration {
 	@Bean
 	@StepScope
 	public ItemReader<Person> reader(@Value("#{jobParameters['inputPath']}") String inputPath){
-		System.out.println(inputPath);
+		System.out.println("ItemReader");
         PoiItemReader<Person> reader = new PoiItemReader<Person>();
         reader.setName("readername");
         reader.setLinesToSkip(1);
@@ -96,6 +96,8 @@ public class JobConfiguration {
     
 	@Bean
 	public ItemProcessor<Person,AnonymizePerson> processor() {
+		System.out.println("processor");
+
 		return new ItemProcessor<Person,AnonymizePerson>(){
 			@Override
 			public AnonymizePerson process(Person person) throws Exception {
